@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
+  "gopkg.in/gcfg.v1"
+	"github.com/mailgun/mailgun-go"
 )
 
 // Config is the struct for config file in ~/.mailgunme
@@ -26,7 +28,7 @@ func parse_config() Config {
 
 // send will do the actual call
 func send(cfg Config, to, msg string) {
-	fmt.Println("CURL")
+	fmt.Println("phone home")
 }
 
 // main parses config and cli options and calls send function
