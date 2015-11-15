@@ -14,4 +14,3 @@ mailgunme -s "testing subject" -f "Name" -m "A nice message." -t recipient@maila
 
 # ToDo
 - accept message as stdin
-- default values in config file
