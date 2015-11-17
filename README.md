@@ -1,16 +1,17 @@
 # mailgunme
-binary to fastly be fetched from bintray and used from cli to send emails using https
+binary to fastly be fetched from bintray and used from cli to send emails using https to mailgun
 
 # howto
 Save config to ~/.mailgunme
 
-[mailgun]
-domain=domainname.com
-publickey=public-key-from-mailgun
-privatekey=private-key-from-mailgun
+[mailgun]  
+domain=domainname.com  
+publickey=public-key-from-mailgun  
+privatekey=private-key-from-mailgun   
 
-Usage:
+Usage:  
 mailgunme -s "testing subject" -f "Name" -m "A nice message." -t recipient@mailaddressexample.com
 
 # ToDo
 - accept message as stdin
+- attachments
