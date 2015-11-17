@@ -33,49 +33,29 @@ func parse_config() Config {
 	return cfg
 }
 
+//defaultchecker
+func defaultchecker(configvalue, arg string) string {
+	var retval string
+	if configvalue != "" {
+		retval = configvalue
+	}
+	if arg != "" {
+		retval = arg
+	}
+	if retval == "" {
+		log.Fatalf("No " + arg + " set!")
+	}
+	return retval
+}
+
 // send will do the actual call
 func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 	var tfromaddressname, tfromname, tto, tsubject string
 
-	if cfg.Mailgun.Fromaddressname != "" {
-		tfromaddressname = cfg.Mailgun.Fromaddressname
-	}
-	if fromaddressname != "" {
-		tfromaddressname = fromaddressname
-	}
-	if tfromaddressname == "" {
-		log.Fatalf("No From address name set!")
-	}
-
-	if cfg.Mailgun.Fromname != "" {
-		tfromname = cfg.Mailgun.Fromname
-	}
-	if fromname != "" {
-		tfromname = fromname
-	}
-	if tfromname == "" {
-		log.Fatalf("No From name set!")
-	}
-
-	if cfg.Mailgun.Toaddress != "" {
-		tto = cfg.Mailgun.Toaddress
-	}
-	if to != "" {
-		tto = to
-	}
-	if tto == "" {
-		log.Fatalf("No to address set!")
-	}
-
-	if cfg.Mailgun.Subject != "" {
-		tsubject = cfg.Mailgun.Subject
-	}
-	if subject != "" {
-		tsubject = subject
-	}
-	if tsubject == "" {
-		log.Fatalf("No subject set!")
-	}
+	tfromaddressname = defaultchecker(cfg.Mailgun.Fromaddressname, tfromaddressname)
+	tfromname = defaultchecker(cfg.Mailgun.Fromname, fromname)
+	tto = defaultchecker(cfg.Mailgun.Toaddress, to)
+	tsubject = defaultchecker(cfg.Mailgun.Subject, subject)
 
 	gun := mailgun.NewMailgun(cfg.Mailgun.Domain, cfg.Mailgun.Privatekey, cfg.Mailgun.Publickey)
 	m := mailgun.NewMessage(tfromname+
