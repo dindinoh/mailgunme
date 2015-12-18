@@ -18,7 +18,7 @@ type Config struct {
 }
 
 // parse_config reads config file in ~/.mailgunme
-func parse_config() Config {
+func parseConfig() Config {
 	var cfg Config
 	home, err := homedir.Dir()
 	if err != nil {
@@ -28,7 +28,7 @@ func parse_config() Config {
 	err = gcfg.ReadFileInto(&cfg, home+"/.mailgunme")
 
 	if err != nil {
-		log.Fatalf("Failed to parse mailgunme config file in ~/.mailgunme\n", err)
+		log.Fatal("Failed to parse mailgunme config file in ~/.mailgunme\n", err)
 	}
 	return cfg
 }
@@ -65,7 +65,7 @@ func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 		tto)
 	response, id, err := gun.Send(m)
 	if err != nil {
-		log.Fatalf("Error sending email!\n", err)
+		log.Fatal("Error sending email!\n", err)
 	}
 	fmt.Printf("Response ID: %s\n", id)
 	fmt.Printf("Message from server: %s\n", response)
@@ -81,7 +81,7 @@ func main() {
 	flag.Parse()
 
 	var cfg Config
-	cfg = parse_config()
+	cfg = parseConfig()
 
 	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, *messagePtr, *subjectPtr)
 }
