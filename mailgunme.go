@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
-
 	"github.com/mailgun/mailgun-go"
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/gcfg.v1"
+	"log"
 )
 
 // Config is the struct for config file in ~/.mailgunme
@@ -34,16 +33,18 @@ func parseConfig() Config {
 }
 
 //defaultchecker
-func defaultchecker(configvalue, arg string) string {
+func defaultchecker(configvalue, arg, name string) string {
 	var retval string
+
 	if configvalue != "" {
 		retval = configvalue
 	}
+
 	if arg != "" {
 		retval = arg
 	}
 	if retval == "" {
-		log.Fatalf("No " + arg + " set!")
+		log.Fatalf("No " + name + " set!")
 	}
 	return retval
 }
@@ -52,10 +53,10 @@ func defaultchecker(configvalue, arg string) string {
 func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 	var tfromaddressname, tfromname, tto, tsubject string
 
-	tfromaddressname = defaultchecker(cfg.Mailgun.Fromaddressname, tfromaddressname)
-	tfromname = defaultchecker(cfg.Mailgun.Fromname, fromname)
-	tto = defaultchecker(cfg.Mailgun.Toaddress, to)
-	tsubject = defaultchecker(cfg.Mailgun.Subject, subject)
+	tfromaddressname = defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
+	tfromname = defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
+	tto = defaultchecker(cfg.Mailgun.Toaddress, to, "To")
+	tsubject = defaultchecker(cfg.Mailgun.Subject, subject, "Subject")
 
 	gun := mailgun.NewMailgun(cfg.Mailgun.Domain, cfg.Mailgun.Privatekey, cfg.Mailgun.Publickey)
 	m := mailgun.NewMessage(tfromname+
