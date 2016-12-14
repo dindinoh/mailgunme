@@ -1,4 +1,5 @@
-https://api.shippable.com/projects/564a2e221895ca4474239d2d/badge
+[![Build Status](https://api.shippable.com/projects/564a2e221895ca4474239d2d/badge)](https://api.shippable.com/projects/564a2e221895ca4474239d2d/badge)
+
 
 # mailgunme
 binary to fastly be fetched from bintray and used from cli to send emails using https to mailgun
