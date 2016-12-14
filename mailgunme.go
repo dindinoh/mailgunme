@@ -8,6 +8,8 @@ import (
 	"gopkg.in/gcfg.v1"
 	"log"
 	"errors"
+	"os"
+	"bufio"
 )
 
 // Config is the struct for config file in ~/.mailgunme
@@ -77,6 +79,7 @@ func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 // main parses config and cli options and calls send function
 func main() {
 	var err error
+	var message string
 	fromaddressnamePtr := flag.String("n", "", "from(@)")
 	fromnamePtr := flag.String("f", "", "From Name")
 	messagePtr := flag.String("m", "", "message")
@@ -84,11 +87,23 @@ func main() {
 	toPtr := flag.String("t", "", "to-address")
 	flag.Parse()
 
+	// look for pipe for message
+	messin, err := os.Stdin.Stat()
+	if messin.Mode() & os.ModeNamedPipe != 0 {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			message = scanner.Text()
+		}
+	} else {
+		message = *messagePtr
+	}
+	
+	// parse config
 	var cfg Config
 	cfg, err = ParseConfig()
 	if err != nil {
 		log.Fatalf("FATAL")
 	}
 	
-	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, *messagePtr, *subjectPtr)
+	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, message, *subjectPtr)
 }
