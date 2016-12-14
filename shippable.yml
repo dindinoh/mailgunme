@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.4
+  - 1.6
 
 before_install:
   - source $HOME/.gvm/scripts/gvm;
@@ -14,7 +14,8 @@ before_install:
   - go get github.com/onsi/gomega
   - go get github.com/onsi/ginkgo
   - go get github.com/jstemmer/go-junit-report
-
+  - cp mailgunmeconf ~/.mailgunme
+  
 install:
   - go get -d -v ./... && go build -v ./...
 
