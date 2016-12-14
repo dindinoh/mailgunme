@@ -1,4 +1,4 @@
 #!/bin/bash
 
 go build --ldflags '-extldflags "-static"' mailgunme.go
-mv mailgunme mailgunme.linux
+mv mailgunme mgm.linux
