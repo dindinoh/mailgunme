@@ -1,0 +1,5 @@
+[mailgun]
+fromaddressname="Dindinoh Shippable"
+fromname="dindinoh"
+domain=dindinoh.net
+subject="from shippable"
