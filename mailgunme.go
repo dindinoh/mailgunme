@@ -92,7 +92,7 @@ func main() {
 	if messin.Mode() & os.ModeNamedPipe != 0 {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
-			message = scanner.Text()
+			message = message + scanner.Text() + "\n"
 		}
 	} else {
 		message = *messagePtr

@@ -16,5 +16,4 @@ Usage:
 mailgunme -s "testing subject" -f "Name" -m "A nice message." -t recipient@mailaddressexample.com
 
 # ToDo
-- accept message as stdin
 - attachments
