@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/gcfg.v1"
 	"log"
+	"errors"
 )
 
 // Config is the struct for config file in ~/.mailgunme
@@ -17,25 +18,26 @@ type Config struct {
 }
 
 // parse_config reads config file in ~/.mailgunme
-func parseConfig() Config {
+func ParseConfig() (Config, error) {
 	var cfg Config
-	home, err := homedir.Dir()
-	if err != nil {
-		log.Fatalf("Could not find homedir, really?")
+	var err error
+	var home string
+
+	home, err = homedir.Dir()
+
+	// how to test non existent file, erroneus file?
+	if err == nil {
+		err = gcfg.ReadFileInto(&cfg, home+"/.mailgunme")
 	}
 
-	err = gcfg.ReadFileInto(&cfg, home+"/.mailgunme")
-
-	if err != nil {
-		log.Fatal("Failed to parse mailgunme config file in ~/.mailgunme\n", err)
-	}
-	return cfg
+	return cfg, err
 }
 
-//defaultchecker
-func defaultchecker(configvalue, arg, name string) string {
+//defaultchecker will try to find a default if a value is not provided
+func Defaultchecker(configvalue, arg, name string) (string, error) {
 	var retval string
-
+	var err error
+	
 	if configvalue != "" {
 		retval = configvalue
 	}
@@ -43,20 +45,20 @@ func defaultchecker(configvalue, arg, name string) string {
 	if arg != "" {
 		retval = arg
 	}
-	if retval == "" {
-		log.Fatalf("No " + name + " set!")
+	if retval == "" || name == ""{
+		err = errors.New("Empty or missing value.")
 	}
-	return retval
+	return retval, err
 }
 
 // send will do the actual call
 func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 	var tfromaddressname, tfromname, tto, tsubject string
 
-	tfromaddressname = defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
-	tfromname = defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
-	tto = defaultchecker(cfg.Mailgun.Toaddress, to, "To")
-	tsubject = defaultchecker(cfg.Mailgun.Subject, subject, "Subject")
+	tfromaddressname,_ = Defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
+	tfromname,_ = Defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
+	tto,_ = Defaultchecker(cfg.Mailgun.Toaddress, to, "To")
+	tsubject,_ = Defaultchecker(cfg.Mailgun.Subject, subject, "Subject")
 
 	gun := mailgun.NewMailgun(cfg.Mailgun.Domain, cfg.Mailgun.Privatekey, cfg.Mailgun.Publickey)
 	m := mailgun.NewMessage(tfromname+
@@ -74,6 +76,7 @@ func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
 
 // main parses config and cli options and calls send function
 func main() {
+	var err error
 	fromaddressnamePtr := flag.String("n", "", "from(@)")
 	fromnamePtr := flag.String("f", "", "From Name")
 	messagePtr := flag.String("m", "", "message")
@@ -82,7 +85,10 @@ func main() {
 	flag.Parse()
 
 	var cfg Config
-	cfg = parseConfig()
-
+	cfg, err = ParseConfig()
+	if err != nil {
+		log.Fatalf("FATAL")
+	}
+	
 	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, *messagePtr, *subjectPtr)
 }
