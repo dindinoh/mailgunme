@@ -1,15 +1,15 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/mailgun/mailgun-go"
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/gcfg.v1"
 	"log"
-	"errors"
 	"os"
-	"bufio"
 )
 
 // Config is the struct for config file in ~/.mailgunme
@@ -39,7 +39,7 @@ func ParseConfig() (Config, error) {
 func Defaultchecker(configvalue, arg, name string) (string, error) {
 	var retval string
 	var err error
-	
+
 	if configvalue != "" {
 		retval = configvalue
 	}
@@ -47,20 +47,24 @@ func Defaultchecker(configvalue, arg, name string) (string, error) {
 	if arg != "" {
 		retval = arg
 	}
-	if retval == "" || name == ""{
+	if retval == "" || name == "" {
 		err = errors.New("Empty or missing value.")
 	}
 	return retval, err
 }
 
 // send will do the actual call
-func send(cfg Config, fromaddressname, fromname, to, message, subject string) {
+func send(cfg Config, fromaddressname, fromname, to, message, subject string, attachment ...string) {
 	var tfromaddressname, tfromname, tto, tsubject string
 
-	tfromaddressname,_ = Defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
-	tfromname,_ = Defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
-	tto,_ = Defaultchecker(cfg.Mailgun.Toaddress, to, "To")
-	tsubject,_ = Defaultchecker(cfg.Mailgun.Subject, subject, "Subject")
+	if len(attachment) > 0 {
+		fmt.Println(attachment[0])
+	}
+
+	tfromaddressname, _ = Defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
+	tfromname, _ = Defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
+	tto, _ = Defaultchecker(cfg.Mailgun.Toaddress, to, "To")
+	tsubject, _ = Defaultchecker(cfg.Mailgun.Subject, subject, "Subject")
 
 	gun := mailgun.NewMailgun(cfg.Mailgun.Domain, cfg.Mailgun.Privatekey, cfg.Mailgun.Publickey)
 	m := mailgun.NewMessage(tfromname+
@@ -83,13 +87,14 @@ func main() {
 	fromaddressnamePtr := flag.String("n", "", "from(@)")
 	fromnamePtr := flag.String("f", "", "From Name")
 	messagePtr := flag.String("m", "", "message")
+	attachmentPtr := flag.String("a", "", "attachment")
 	subjectPtr := flag.String("s", "", "subject")
 	toPtr := flag.String("t", "", "to-address")
 	flag.Parse()
 
 	// look for pipe for message
 	messin, err := os.Stdin.Stat()
-	if messin.Mode() & os.ModeNamedPipe != 0 {
+	if messin.Mode()&os.ModeNamedPipe != 0 {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			message = message + scanner.Text() + "\n"
@@ -97,13 +102,20 @@ func main() {
 	} else {
 		message = *messagePtr
 	}
-	
+
 	// parse config
 	var cfg Config
 	cfg, err = ParseConfig()
 	if err != nil {
 		log.Fatalf("FATAL")
 	}
-	
-	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, message, *subjectPtr)
+
+	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, message, *subjectPtr, *attachmentPtr)
 }
+
+// AddAttachment arranges to send a file from the filesystem along with the e-mail message.
+// The attachment parameter is a filename, which must refer to a file which actually resides
+// in the local filesystem.
+// func (m *Message) AddAttachment(attachment string) {
+// 	m.attachments = append(m.attachments, attachment)
+// }
