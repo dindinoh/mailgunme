@@ -87,7 +87,7 @@ func main() {
 	var message string
 	fromaddressnamePtr := flag.String("n", "", "from(@)")
 	fromnamePtr := flag.String("f", "", "From Name")
-	messagePtr := flag.String("m", "", "message")
+	messagePtr := flag.String("m", "", "message (also stdin")
 	attachmentPtr := flag.String("a", "", "attachment")
 	subjectPtr := flag.String("s", "", "subject")
 	toPtr := flag.String("t", "", "to-address")
