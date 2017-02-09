@@ -57,10 +57,6 @@ func Defaultchecker(configvalue, arg, name string) (string, error) {
 func send(cfg Config, fromaddressname, fromname, to, message, subject string, attachment ...string) {
 	var tfromaddressname, tfromname, tto, tsubject string
 
-	if len(attachment) > 0 {
-		fmt.Println(attachment[0])
-	}
-
 	tfromaddressname, _ = Defaultchecker(cfg.Mailgun.Fromaddressname, fromaddressname, "From address name")
 	tfromname, _ = Defaultchecker(cfg.Mailgun.Fromname, fromname, "From name")
 	tto, _ = Defaultchecker(cfg.Mailgun.Toaddress, to, "To")
@@ -72,6 +68,11 @@ func send(cfg Config, fromaddressname, fromname, to, message, subject string, at
 		tsubject,
 		message,
 		tto)
+	
+	if len(attachment) > 0 {
+		m.AddAttachment(attachment[0])
+	}
+
 	response, id, err := gun.Send(m)
 	if err != nil {
 		log.Fatal("Error sending email!\n", err)
