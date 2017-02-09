@@ -114,9 +114,3 @@ func main() {
 	send(cfg, *fromaddressnamePtr, *fromnamePtr, *toPtr, message, *subjectPtr, *attachmentPtr)
 }
 
-// AddAttachment arranges to send a file from the filesystem along with the e-mail message.
-// The attachment parameter is a filename, which must refer to a file which actually resides
-// in the local filesystem.
-// func (m *Message) AddAttachment(attachment string) {
-// 	m.attachments = append(m.attachments, attachment)
-// }
